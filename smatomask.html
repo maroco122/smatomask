@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방진마스크 추천 계산기</title>
+    <style>
+        body { font-family: 'Poppins', sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .section { margin-bottom: 20px; }
+        .buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        button { padding: 12px; border: none; background-color: #007BFF; color: white; cursor: pointer; border-radius: 8px; font-weight: bold; transition: background 0.3s ease-in-out; }
+        button.active { background-color: #28a745; }
+        button:hover { background-color: #0056b3; }
+        .result { margin-top: 20px; font-size: 1.4em; font-weight: bold; color: #007BFF; }
+        .link-container { margin-top: 10px; }
+        .link-container a { display: inline-block; padding: 12px 18px; background-color: #ff5722; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: background 0.3s ease-in-out; }
+        .link-container a:hover { background-color: #d84315; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>방진마스크 추천 계산기</h1>
+        
+        <div class="section">
+            <h2>사용 환경 선택</h2>
+            <div class="buttons" id="environment"></div>
+        </div>
+
+        <div class="section">
+            <h2>필터링해야 하는 입자</h2>
+            <div class="buttons" id="particleTypes"></div>
+        </div>
+
+        <div class="section">
+            <h2>착용 시간</h2>
+            <div class="buttons" id="wearDuration"></div>
+        </div>
+
+        <div class="result" id="result"></div>
+        <div class="link-container" id="maskLink" style="display: none;">
+            <a href="https://smartstore.naver.com/allgagu/products/6859496161" target="_blank">추천 방진마스크</a>
+        </div>
+    </div>
+
+    <script>
+        const environments = ["실내", "실외", "공사 현장", "제조업", "목공 작업", "실험실", "미세먼지", "농약 작업", "자동차 정비"];
+        const particleTypes = ["미세먼지", "금속 분진", "목재 가루", "화학물질", "바이러스", "오일 미스트", "세라믹 분진", "플라스틱 연기", "유독 가스"];
+        const wearDurations = ["1~2시간", "4~8시간", "8시간 이상"];
+        
+        const selected = { environment: "", particleTypes: "", wearDuration: "" };
+        
+        function createButtons(id, options, category) {
+            const container = document.getElementById(id);
+            options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => selectOption(category, option, button);
+                container.appendChild(button);
+            });
+        }
+        
+        function selectOption(category, value, button) {
+            selected[category] = value;
+            document.querySelectorAll(`#${category} button`).forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+            checkSelection();
+        }
+        
+        function checkSelection() {
+            if (Object.values(selected).every(val => val)) {
+                const recommendation = getMaskRecommendation(selected);
+                document.getElementById("result").textContent = `추천 마스크 등급: ${recommendation}`;
+                
+                if (recommendation === "1급" || recommendation === "2급") {
+                    document.getElementById("maskLink").style.display = "block";
+                } else {
+                    document.getElementById("maskLink").style.display = "none";
+                }
+            }
+        }
+        
+        function getMaskRecommendation(selected) {
+            if (selected.particleTypes === "바이러스" || selected.particleTypes === "미세먼지") {
+                return "1급";
+            } else if (selected.particleTypes === "금속 분진" || selected.particleTypes === "화학물질" || selected.particleTypes === "세라믹 분진") {
+                return "2급";
+            } else {
+                return "특급";
+            }
+        }
+        
+        createButtons("environment", environments, "environment");
+        createButtons("particleTypes", particleTypes, "particleTypes");
+        createButtons("wearDuration", wearDurations, "wearDuration");
+    </script>
+</body>
+</html>
